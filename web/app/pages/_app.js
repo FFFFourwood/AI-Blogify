@@ -1,21 +1,17 @@
-import * as React from 'react';
-import { CacheProvider } from '@emotion/react';
-import createCache from '@emotion/cache';
-import { ThemeProvider, CssBaseline } from '@mui/material';
-import theme from '../styles/theme';
 import '../styles/globals.css';
+import { AuthProvider } from '../contexts/AuthContext';
+import Layout from '../components/Layout';
 
-const cache = createCache({ key: 'css', prepend: true });
-
-export default function MyApp(props) {
-    const { Component, pageProps } = props;
+function MyApp({ Component, pageProps }) {
+    const { showHeader = true, showFooter = true, showSidebar = true } = Component;
 
     return (
-        <CacheProvider value={cache}>
-            <ThemeProvider theme={theme}>
-                <CssBaseline />
+        <AuthProvider>
+            <Layout showHeader={showHeader} showFooter={showFooter} showSidebar={showSidebar}>
                 <Component {...pageProps} />
-            </ThemeProvider>
-        </CacheProvider>
+            </Layout>
+        </AuthProvider>
     );
 }
+
+export default MyApp;

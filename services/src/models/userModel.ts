@@ -4,7 +4,7 @@ export interface IUser extends Document {
     username: string;
     email: string;
     password?: string;
-    role: string;
+    role: Schema.Types.ObjectId;
     createdAt: Date;
     updatedAt: Date;
     oauthProvider?: string;
@@ -17,7 +17,7 @@ const userSchema = new Schema<IUser>({
     username: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
     password: { type: String },
-    role: { type: String, default: 'user' },
+    role: { type: Schema.Types.ObjectId, ref: 'Role', required: true },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
     oauthProvider: { type: String },
@@ -31,3 +31,4 @@ const userSchema = new Schema<IUser>({
 const User = model<IUser>('User', userSchema);
 
 export default User;
+
