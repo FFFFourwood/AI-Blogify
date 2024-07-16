@@ -5,6 +5,7 @@ export interface IArticle extends Document {
     content: string;
     author: ObjectId;
     createdAt: Date;
+    updatedAt: Date;
 }
 
 const articleSchema = new Schema<IArticle>({
@@ -12,6 +13,9 @@ const articleSchema = new Schema<IArticle>({
     content: { type: String, required: true },
     author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now },
+}, {
+    timestamps: true
 });
 
 const Article = model<IArticle>('Article', articleSchema);
