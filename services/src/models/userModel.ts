@@ -11,6 +11,7 @@ export interface IUser extends Document {
     oauthId?: string;
     oauthToken?: string;
     walletAddress?: string;
+    avatar?: string;
 }
 
 const userSchema = new Schema<IUser>({
@@ -24,6 +25,7 @@ const userSchema = new Schema<IUser>({
     oauthId: { type: String },
     oauthToken: { type: String },
     walletAddress: { type: String, unique: true },
+    avatar: { type: String },
 }, {
     timestamps: true
 });

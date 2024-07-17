@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "ts-node-dev src/server.ts",
-    "lint": "eslint src/**/*.{js,ts}"
+    "lint": "eslint src/**/*.{js,ts}",
+    "init": "ts-node-dev src/utils/seedAdmin.ts"
   },
   "keywords": [],
   "author": "",

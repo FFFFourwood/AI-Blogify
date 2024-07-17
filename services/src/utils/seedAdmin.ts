@@ -12,7 +12,7 @@ const seedAdmin = async () => {
         const adminExists = await User.findOne({ email: 'admin@example.com' });
 
         if (!adminExists) {
-            const hashedPassword = await bcrypt.hash('adminpassword', 10);
+            const hashedPassword = await bcrypt.hash('admin', 10);
             const admin = new User({
                 username: 'admin',
                 email: 'admin@example.com',
