@@ -1,10 +1,12 @@
-import { Schema, model, Document } from 'mongoose';
+import mongoose, { Schema, model, Document } from 'mongoose';
+import { IRole } from './roleModel';
+import { UserFrom } from '../utils/enum';
 
 export interface IUser extends Document {
     username: string;
     email: string;
     password?: string;
-    role: Schema.Types.ObjectId;
+    role: mongoose.Types.ObjectId | IRole;
     createdAt: Date;
     updatedAt: Date;
     oauthProvider?: string;
@@ -12,6 +14,9 @@ export interface IUser extends Document {
     oauthToken?: string;
     walletAddress?: string;
     avatar?: string;
+    url?: string;
+    displayName?: string;
+    from: number;
 }
 
 const userSchema = new Schema<IUser>({
@@ -26,6 +31,9 @@ const userSchema = new Schema<IUser>({
     oauthToken: { type: String },
     walletAddress: { type: String, unique: true },
     avatar: { type: String },
+    url: { type: String },
+    displayName: { type: String },
+    from: { type: Number, default: UserFrom.EMAIL }
 }, {
     timestamps: true
 });

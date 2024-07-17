@@ -1,23 +1,17 @@
 {
     "compilerOptions": {
-        "target": "ES2020",
-        "module": "ESNext",
-        "moduleResolution": "node",
+        "target": "es2020",
+        "module": "esnext",
         "strict": true,
         "esModuleInterop": true,
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
         "outDir": "./dist",
-        "baseUrl": "./",
-        "paths": {
-            "*": [
-                "node_modules/*",
-                "src/types/*"
-            ]
-        }
+        "rootDir": "./src",
+        "moduleResolution": "node",
     },
     "include": [
-        "src/**/*"
+        "src/**/*.ts"
     ],
     "exclude": [
         "node_modules",
