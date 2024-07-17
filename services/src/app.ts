@@ -10,21 +10,28 @@ import userRoutes from './routes/userRoutes';
 import openaiRoutes from './routes/openaiRoutes';
 import reportRoutes from './routes/reportRoutes';
 import auditRoutes from './routes/auditRoutes';
-import './config/passport'; // 引入 Passport 配置
-
+// import './config/passport';
+import loadEnvironmentVariables from './config/loadEnv';
+loadEnvironmentVariables();
 const app = express();
 
-// 中间件
+// middlewares
 app.use(cors());
 app.use(express.json());
 app.use(session({ secret: process.env.SESSION_SECRET!, resave: false, saveUninitialized: false }));
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'default_secret',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: !!process.env.COOKIE_SECURE }
+}));
 app.use(passport.initialize());
 app.use(passport.session());
 
-// 连接数据库
+// connect to mongodb
 connectDB();
 
-// 路由
+// router
 app.use('/api/articles', articleRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
@@ -32,7 +39,7 @@ app.use('/api/openai', openaiRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/audits', auditRoutes);
 
-// 错误处理
+// error handler
 app.use(errorHandler);
 
 export default app;
