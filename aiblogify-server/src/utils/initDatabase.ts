@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
-import logger from '../utils/logger';
+import logger from './logger';
 import User from '../models/userModel';
 import Role from '../models/roleModel';
 import { Permission } from '../config/permissions';
