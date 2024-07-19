@@ -3,8 +3,27 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 const secretKey = process.env.JWT_SECRET || 'default_secret_key';
+const tokenExpirationTime = process.env.TOKEN_EXPIRATION_TIME || '72h'; // 72 hours
 
-// 注册
+const generateToken = (userId: string) => {
+    return jwt.sign({ userId }, secretKey, { expiresIn: tokenExpirationTime });
+}
+
+const refreshToken = (userId: string): string => {
+    return generateToken(userId);
+};
+
+
+const verifyTokenFn = (token: string): any => {
+    try {
+        return jwt.verify(token, secretKey);
+    } catch (err) {
+        return null;
+    }
+};
+
+
+// register
 const register = async (username: string, email: string, password: string): Promise<IUser> => {
     const hashedPassword = await bcrypt.hash(password, 10);
     return User.create({
@@ -14,7 +33,7 @@ const register = async (username: string, email: string, password: string): Prom
     });
 };
 
-// 登录
+// login
 const login = async (email: string, password: string): Promise<{ user: IUser; token: string } | null> => {
     const user = await User.findOne({ email });
 
@@ -28,12 +47,12 @@ const login = async (email: string, password: string): Promise<{ user: IUser; to
         return null;
     }
 
-    const token = jwt.sign({ id: user._id }, secretKey, { expiresIn: '1h' });
+    const token = generateToken(user._id.toString());
 
     return { user, token };
 };
 
-// OAuth 登录或注册
+// OAuth 
 const oauthLogin = async (oauthProvider: string, oauthId: string, email: string, username: string, token: string): Promise<{ user: IUser; jwtToken: string }> => {
     let user = await User.findOne({ oauthProvider, oauthId });
 
@@ -53,7 +72,7 @@ const oauthLogin = async (oauthProvider: string, oauthId: string, email: string,
     return { user, jwtToken };
 };
 
-// 区块链钱包登录
+// wallet login
 const walletLogin = async (walletAddress: string): Promise<{ user: IUser; token: string } | null> => {
     const user = await User.findOne({ walletAddress });
 
@@ -71,4 +90,6 @@ export default {
     login,
     oauthLogin,
     walletLogin,
+    refreshToken,
+    verifyTokenFn,
 };

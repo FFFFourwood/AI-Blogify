@@ -1,10 +1,11 @@
 import { Request, Response } from 'express';
 import authService from '../services/authService';
 import jwt from 'jsonwebtoken';
+import logger from '../utils/logger';
+import User, { IUser } from '../models/userModel';
 
-const secretKey = process.env.JWT_SECRET || 'default_secret_key';
 
-// 注册
+// register
 export const register = async (req: Request, res: Response) => {
     const { username, email, password } = req.body;
 
@@ -16,25 +17,35 @@ export const register = async (req: Request, res: Response) => {
     }
 };
 
-// 登录
+// login
 export const login = async (req: Request, res: Response) => {
     const { email, password } = req.body;
-
+    logger.info(`Login request received for email: ${email}`);
     try {
         const result = await authService.login(email, password);
 
         if (!result) {
-            return res.status(401).json({ message: 'Invalid credentials' });
+            logger.warn(`Invalid email or password for email: ${email}`);
+            return res.status(401).json({ result: false, message: 'Invalid email or password' });
         }
 
         const { user, token } = result;
-        res.json({ token, user });
+
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: 72 * 60 * 60 * 1000 // 72 hours
+        });
+        logger.info(`Login successful for email: ${email}`);
+        res.status(200).json({ result: true, token, user });
     } catch (error) {
+        logger.error(`Error logging in for email: ${email}`);
+        logger.error(error);
         res.status(500).json({ message: 'Error logging in', error });
     }
 };
 
-// OAuth 登录或注册
+// OAuth 
 export const oauthLogin = async (req: Request, res: Response) => {
     const { oauthProvider, oauthId, email, username, token } = req.body;
 
@@ -47,7 +58,7 @@ export const oauthLogin = async (req: Request, res: Response) => {
     }
 };
 
-// 区块链钱包登录
+// wallet login
 export const walletLogin = async (req: Request, res: Response) => {
     const { walletAddress } = req.body;
 
@@ -65,23 +76,31 @@ export const walletLogin = async (req: Request, res: Response) => {
     }
 };
 
-// 注销
+// logout
 export const logout = async (req: Request, res: Response) => {
-    res.json({ message: 'User logged out' });
+    res.clearCookie('token');
+    logger.info(`Logout request received`);
+    res.status(200).json({ message: 'Logged out successfully' });
 };
 
-// 验证 JWT 令牌
-export const verifyToken = (req: Request, res: Response) => {
-    const token = req.headers['authorization'];
+// verify jwt Token
+export const verifyToken = async (req: Request, res: Response) => {
+    const token = req.cookies.token;
+    logger.info(token);
 
     if (!token) {
+        logger.info(`verifyToken:No token provided`);
         return res.status(401).json({ message: 'No token provided' });
     }
 
     try {
-        const decoded = jwt.verify(token, secretKey);
-        res.json({ decoded });
+        const decoded = authService.verifyTokenFn(token);
+        const user = await User.findById(decoded.userId).select('-password');
+        logger.info(`verifyToken:Token verified successfully`);
+        res.json({ user });
     } catch (error) {
+        logger.error(`verifyToken:Failed to authenticate token`);
         res.status(401).json({ message: 'Failed to authenticate token', error });
     }
 };
+

@@ -63,6 +63,7 @@ const initDatabase = async () => {
                 email: 'admin@aiblogify.com',
                 password: await bcrypt.hash('admin', 10),
                 role: adminRole!._id,
+                avatar: 'https://gravatar.loli.net/avatar/fc030a0ab5265a8b5c042cfdea61e2e5?d=mm'
             });
             await newAdminUser.save();
             logger.info('Admin user created.');
