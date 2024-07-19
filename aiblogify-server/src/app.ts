@@ -10,13 +10,18 @@ import userRoutes from './routes/userRoutes';
 import openaiRoutes from './routes/openaiRoutes';
 import reportRoutes from './routes/reportRoutes';
 import auditRoutes from './routes/auditRoutes';
+import cookieParser from 'cookie-parser';
 // import './config/passport';
 import loadEnvironmentVariables from './config/loadEnv';
 loadEnvironmentVariables();
 const app = express();
 
 // middlewares
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:3000', // 更新为你的前端URL
+    credentials: true,
+}));
+app.use(cookieParser());
 app.use(express.json());
 app.use(session({ secret: process.env.SESSION_SECRET!, resave: false, saveUninitialized: false }));
 app.use(session({
