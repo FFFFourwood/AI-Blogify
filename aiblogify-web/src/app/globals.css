@@ -54,3 +54,9 @@ body {
     display: block;
     width: calc(38.39vw + 582.9px)
 }
+
+@media screen and (max-width: 1024px) {
+    .ai-blogify-content-wrap {
+        width: 100%;
+    }
+}
