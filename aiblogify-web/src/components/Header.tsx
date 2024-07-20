@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -33,8 +34,10 @@ import Container from "@mui/material/Container";
 import Slide from "@mui/material/Slide";
 import { useAuth } from "../contexts/AuthContext";
 import { useDialog } from "./LoginDialog";
-
-const pages = ["Home", "Articles", "Discover", "Report", "Admin", "About"];
+import { permission } from "process";
+import { Permission } from "../utils/permissions";
+import { promises } from "dns";
+import { Console } from "console";
 
 const drawerWidth = 240;
 interface Props {
@@ -73,8 +76,67 @@ const Header = () => {
     const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
     const [blogName, setBlogName] = React.useState("AI BLOGIFY");
     const open = Boolean(anchorElUser);
-    const { user, isAuthenticated, logout } = useAuth();
+    const { user, isAuthenticated, logout, getPermissions } = useAuth();
     const { openDialog } = useDialog();
+    const [permissions, setPermissions] = React.useState<Permission[]>([]);
+    const [isClient, setIsClient] = React.useState(false);
+
+    React.useEffect(() => {
+        setIsClient(true);
+    }, []);
+
+    React.useEffect(() => {
+        const getData = async () => {
+            try {
+                const res = await getPermissions();
+                setPermissions(res);
+            } catch (error) {
+                setPermissions([]);
+                console.error("Not authenticated:", error);
+            }
+        };
+        getData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [user]);
+
+    interface Page {
+        name: string;
+        link: string;
+        permission?: Permission[];
+    }
+    const pages: Page[] = [
+        {
+            name: "Home",
+            link: "/",
+        },
+        {
+            name: "Articles",
+            link: "/articles",
+        },
+        {
+            name: "Discover",
+            link: "/discover",
+        },
+        {
+            name: "Report",
+            link: "/report",
+            permission: [Permission.REPORT],
+        },
+        {
+            name: "Admin",
+            link: "/admin",
+            permission: [Permission.ADMIN],
+        },
+        {
+            name: "About",
+            link: "/about",
+        },
+    ];
+
+    const hasPermission = (pagePermissions?: Permission[] | undefined) => {
+        if (!pagePermissions) return true;
+        return pagePermissions.some((permission) => permissions.includes(permission));
+    };
 
     React.useEffect(() => {
         if (isAuthenticated && user) {
@@ -118,13 +180,18 @@ const Header = () => {
             </Box>
             <Divider />
             <List>
-                {pages.map((item) => (
-                    <ListItem key={item} disablePadding>
-                        <ListItemButton sx={{ textAlign: "center" }}>
-                            <ListItemText primary={item} />
-                        </ListItemButton>
-                    </ListItem>
-                ))}
+                {pages.map(
+                    (item) =>
+                        hasPermission(item.permission) && (
+                            <ListItem key={item.name} disablePadding>
+                                <ListItemButton sx={{ textAlign: "center" }}>
+                                    <Link href={item.link}>
+                                        <ListItemText>{item.name}</ListItemText>
+                                    </Link>
+                                </ListItemButton>
+                            </ListItem>
+                        ),
+                )}
             </List>
         </Box>
     );
@@ -140,11 +207,14 @@ const Header = () => {
                         </IconButton>
 
                         <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
-                            {pages.map((page) => (
-                                <Button key={page} onClick={handleClose} sx={{ my: 2, color: "white", display: "block" }}>
-                                    {page}
-                                </Button>
-                            ))}
+                            {pages.map(
+                                (page) =>
+                                    hasPermission(page.permission) && (
+                                        <Link href={page.link} key={page.name}>
+                                            <Button sx={{ my: 2, color: "white", display: "block" }}>{page.name}</Button>
+                                        </Link>
+                                    ),
+                            )}
                         </Box>
                         <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
                             <Typography textAlign="center">{blogName}</Typography>

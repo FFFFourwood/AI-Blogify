@@ -1,9 +1,7 @@
 import { Router } from 'express';
-import { authenticateJWT, authorize } from '../middleware/authMiddleware';
+import { authorize } from '../middlewares/authMiddleware';
 
 const router = Router();
-
-router.use(authenticateJWT);
 
 router.get('/dashboard', authorize(['admin:read']), (req, res) => {
     res.send('Admin Dashboard');

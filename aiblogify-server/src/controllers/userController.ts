@@ -1,5 +1,42 @@
 import { Request, Response } from 'express';
 import userService from '../services/userService';
+import logger from '../utils/logger';
+import { log } from 'console';
+
+//get user role permissions
+export const getRolePermissions = async (req: Request, res: Response) => {
+    try {
+        logger.info(`getRolePermissions:Getting role permissions for role id: ${req.params.id}`);
+        const role = await userService.getRoleById(req.params.id);
+        if (!role) {
+            logger.warn(`getRolePermissions:Role not found for role id: ${req.params.id}`);
+            return res.status(404).json({ message: 'Role not found' });
+        }
+        logger.info(`getRolePermissions:Role permissions fetched for role id: ${req.params.id}`);
+        res.json(role);
+    } catch (error) {
+        logger.error(`getRolePermissions:Error getting role permissions for role id: ${req.params.id}`);
+        res.status(500).json({ message: 'Error fetching user', error });
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // 获取所有用户
 export const getAllUsers = async (req: Request, res: Response) => {
