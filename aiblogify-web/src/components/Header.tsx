@@ -110,24 +110,24 @@ const Header = () => {
             name: "Articles",
             link: "/articles",
         },
-        {
-            name: "Discover",
-            link: "/discover",
-        },
-        {
-            name: "Report",
-            link: "/report",
-            permission: [Permission.REPORT],
-        },
-        {
-            name: "Admin",
-            link: "/admin",
-            permission: [Permission.ADMIN],
-        },
-        {
-            name: "About",
-            link: "/about",
-        },
+        // {
+        //     name: "Discover",
+        //     link: "/discover",
+        // },
+        // {
+        //     name: "Report",
+        //     link: "/report",
+        //     permission: [Permission.REPORT],
+        // },
+        // {
+        //     name: "Admin",
+        //     link: "/admin",
+        //     permission: [Permission.ADMIN],
+        // },
+        // {
+        //     name: "About",
+        //     link: "/about",
+        // },
     ];
 
     const hasPermission = (pagePermissions?: Permission[] | undefined) => {
