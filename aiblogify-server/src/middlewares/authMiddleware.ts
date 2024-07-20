@@ -7,7 +7,6 @@ interface CustomRequest extends Request {
     userId?: string;
 }
 
-
 const authMiddleware = async (req: CustomRequest, res: Response, next: NextFunction) => {
     const token = req.cookies.token;
 
@@ -37,9 +36,11 @@ const authMiddleware = async (req: CustomRequest, res: Response, next: NextFunct
 
 export default authMiddleware;
 
+// authorize permissions for BE routes
 export const authorize = (permissions: string[]) => {
     return (req: Request, res: Response, next: NextFunction) => {
         const user = (req as any).user;
+        // const userRole = user.role;
         const userPermissions = user.role.permissions;
 
         const hasPermission = permissions.every(permission => userPermissions.includes(permission));

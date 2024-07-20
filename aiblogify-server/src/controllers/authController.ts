@@ -4,19 +4,6 @@ import jwt from 'jsonwebtoken';
 import logger from '../utils/logger';
 import User, { IUser } from '../models/userModel';
 
-
-// register
-export const register = async (req: Request, res: Response) => {
-    const { username, email, password } = req.body;
-
-    try {
-        const user = await authService.register(username, email, password);
-        res.status(201).json({ message: 'User created', user });
-    } catch (error) {
-        res.status(500).json({ message: 'Error creating user', error });
-    }
-};
-
 // login
 export const login = async (req: Request, res: Response) => {
     const { email, password } = req.body;
@@ -44,6 +31,66 @@ export const login = async (req: Request, res: Response) => {
         res.status(500).json({ message: 'Error logging in', error });
     }
 };
+
+// logout
+export const logout = async (req: Request, res: Response) => {
+    res.clearCookie('token');
+    logger.info(`Logout request received`);
+    res.status(200).json({ message: 'Logged out successfully' });
+};
+
+// verify jwt Token
+export const verifyToken = async (req: Request, res: Response) => {
+    const token = req.cookies.token;
+    logger.info(token);
+
+    if (!token) {
+        logger.info(`verifyToken:No token provided`);
+        return res.status(401).json({ message: 'No token provided' });
+    }
+
+    try {
+        const decoded = authService.verifyTokenFn(token);
+        const user = await User.findById(decoded.userId).select('-password');
+        logger.info(`verifyToken:Token verified successfully`);
+        res.json({ user });
+    } catch (error) {
+        logger.error(`verifyToken:Failed to authenticate token`);
+        res.status(401).json({ message: 'Failed to authenticate token', error });
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// register
+export const register = async (req: Request, res: Response) => {
+    const { username, email, password } = req.body;
+
+    try {
+        const user = await authService.register(username, email, password);
+        res.status(201).json({ message: 'User created', user });
+    } catch (error) {
+        res.status(500).json({ message: 'Error creating user', error });
+    }
+};
+
 
 // OAuth 
 export const oauthLogin = async (req: Request, res: Response) => {
@@ -76,31 +123,4 @@ export const walletLogin = async (req: Request, res: Response) => {
     }
 };
 
-// logout
-export const logout = async (req: Request, res: Response) => {
-    res.clearCookie('token');
-    logger.info(`Logout request received`);
-    res.status(200).json({ message: 'Logged out successfully' });
-};
-
-// verify jwt Token
-export const verifyToken = async (req: Request, res: Response) => {
-    const token = req.cookies.token;
-    logger.info(token);
-
-    if (!token) {
-        logger.info(`verifyToken:No token provided`);
-        return res.status(401).json({ message: 'No token provided' });
-    }
-
-    try {
-        const decoded = authService.verifyTokenFn(token);
-        const user = await User.findById(decoded.userId).select('-password');
-        logger.info(`verifyToken:Token verified successfully`);
-        res.json({ user });
-    } catch (error) {
-        logger.error(`verifyToken:Failed to authenticate token`);
-        res.status(401).json({ message: 'Failed to authenticate token', error });
-    }
-};
 

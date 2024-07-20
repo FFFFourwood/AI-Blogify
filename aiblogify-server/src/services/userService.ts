@@ -1,4 +1,11 @@
 import User, { IUser } from '../models/userModel';
+import Role, { IRole } from '../models/roleModel';
+
+const getRoleById = async (id: string): Promise<IRole | null> => {
+    return Role.findById(id);
+};
+
+
 
 const getAllUsers = async (): Promise<IUser[]> => {
     return User.find();
@@ -36,4 +43,5 @@ export default {
     getUserById,
     updateUser,
     deleteUser,
+    getRoleById,
 };
