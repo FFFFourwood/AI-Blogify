@@ -1,21 +1,7 @@
 'use client'
 import { createTheme } from '@mui/material/styles';
 
-const theme = createTheme({
-    palette: {
-        primary: {
-            main: '#1976d2',
-        },
-        secondary: {
-            main: '#dc004e',
-        },
-        error: {
-            main: '#f44336',
-        },
-        background: {
-            default: '#fff',
-        },
-    },
+const basicConfig = {
     typography: {
         fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
         h1: {
@@ -57,6 +43,25 @@ const theme = createTheme({
             },
         },
     },
-});
+};
+
+const themeBasic = {
+    ...basicConfig,
+    palette: {
+        primary: {
+            main: '#fc5185',
+        },
+        secondary: {
+            main: '#f5f5f5',
+        },
+        error: {
+            main: '#f44336',
+        },
+        background: {
+            default: '#fff',
+        },
+    }
+}
+const theme = createTheme(themeBasic);
 
 export default theme;

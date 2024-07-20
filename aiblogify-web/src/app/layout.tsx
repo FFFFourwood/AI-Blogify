@@ -26,7 +26,7 @@ export default function RootLayout({
                             <div className="flex flex-col min-h-screen">
                                 <Header />
                                 <div className="flex flex-1 mt-16">
-                                    <main className="flex-1 p-4">{children}</main>
+                                    <main className="flex flex-1 p-4 justify-center">{children}</main>
                                 </div>
                                 <Footer />
                             </div>
