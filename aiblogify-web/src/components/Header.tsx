@@ -16,11 +16,8 @@ import SearchIcon from "@mui/icons-material/Search";
 import Paper from "@mui/material/Paper";
 import InputBase from "@mui/material/InputBase";
 import Divider from "@mui/material/Divider";
-import DirectionsIcon from "@mui/icons-material/Directions";
 import Stack from "@mui/material/Stack";
 import ListItemIcon from "@mui/material/ListItemIcon";
-import Tooltip from "@mui/material/Tooltip";
-import PersonAdd from "@mui/icons-material/PersonAdd";
 import Settings from "@mui/icons-material/Settings";
 import Logout from "@mui/icons-material/Logout";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -34,10 +31,9 @@ import Container from "@mui/material/Container";
 import Slide from "@mui/material/Slide";
 import { useAuth } from "../contexts/AuthContext";
 import { useDialog } from "./LoginDialog";
-import { permission } from "process";
 import { Permission } from "../utils/permissions";
-import { promises } from "dns";
-import { Console } from "console";
+import { usePathname } from "next/navigation";
+import { StringDecoder } from "string_decoder";
 
 const drawerWidth = 240;
 interface Props {
@@ -80,6 +76,7 @@ const Header = () => {
     const { openDialog } = useDialog();
     const [permissions, setPermissions] = React.useState<Permission[]>([]);
     const [isClient, setIsClient] = React.useState(false);
+    const pathname = usePathname();
 
     React.useEffect(() => {
         setIsClient(true);
