@@ -2,6 +2,14 @@
  An AI integrated intelligent blog system!
 
 
+## Introduction
+AI Blogify is a powerful personal blogging system integrated with AI
+
+###### Supported Features
+- [x] start project 
+###### Working on it!
+- [ ]  Write, View, Edit, Delete articles for basic blog system fetures 
+
 
 ### Development Logs
 - 2024-07-16 : initial project
