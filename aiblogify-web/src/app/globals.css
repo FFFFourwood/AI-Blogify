@@ -52,7 +52,8 @@ body {
 
 .ai-blogify-content-wrap {
     display: block;
-    width: calc(38.39vw + 582.9px)
+    width: calc(38.39vw + 582.9px);
+    max-width: 1320px;
 }
 
 .ai-blogify-header {
