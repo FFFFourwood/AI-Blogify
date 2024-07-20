@@ -110,24 +110,24 @@ const Header = () => {
             name: "Articles",
             link: "/articles",
         },
-        // {
-        //     name: "Discover",
-        //     link: "/discover",
-        // },
-        // {
-        //     name: "Report",
-        //     link: "/report",
-        //     permission: [Permission.REPORT],
-        // },
-        // {
-        //     name: "Admin",
-        //     link: "/admin",
-        //     permission: [Permission.ADMIN],
-        // },
-        // {
-        //     name: "About",
-        //     link: "/about",
-        // },
+        {
+            name: "Discover",
+            link: "/discover",
+        },
+        {
+            name: "Report",
+            link: "/report",
+            permission: [Permission.REPORT],
+        },
+        {
+            name: "Admin",
+            link: "/admin",
+            permission: [Permission.ADMIN],
+        },
+        {
+            name: "About",
+            link: "/about",
+        },
     ];
 
     const hasPermission = (pagePermissions?: Permission[] | undefined) => {
@@ -180,13 +180,13 @@ const Header = () => {
                 {pages.map(
                     (item) =>
                         hasPermission(item.permission) && (
-                            <ListItem key={item.name} disablePadding>
-                                <ListItemButton sx={{ textAlign: "center" }}>
-                                    <Link href={item.link}>
+                            <Link href={item.link} key={item.name}>
+                                <ListItem disablePadding>
+                                    <ListItemButton sx={{ textAlign: "center" }} selected={pathname === item.link}>
                                         <ListItemText>{item.name}</ListItemText>
-                                    </Link>
-                                </ListItemButton>
-                            </ListItem>
+                                    </ListItemButton>
+                                </ListItem>
+                            </Link>
                         ),
                 )}
             </List>
@@ -207,7 +207,7 @@ const Header = () => {
                             {pages.map(
                                 (page) =>
                                     hasPermission(page.permission) && (
-                                        <Link href={page.link} key={page.name}>
+                                        <Link href={page.link} key={page.name} className={`ai-blogify-header ${pathname === page.link ? "active" : ""}`}>
                                             <Button sx={{ my: 2, color: "white", display: "block" }}>{page.name}</Button>
                                         </Link>
                                     ),

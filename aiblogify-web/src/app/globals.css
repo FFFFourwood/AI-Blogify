@@ -55,6 +55,30 @@ body {
     width: calc(38.39vw + 582.9px)
 }
 
+.ai-blogify-header {
+    position: relative;
+}
+
+.ai-blogify-header::after {
+    background: #fff;
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 3px;
+    border-radius: 1px;
+    bottom: 1px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.ai-blogify-header.active::after,
+.ai-blogify-header:hover::after {
+    width: 95%;
+    transition: ease-in-out 0.2s;
+}
+
+
+
 @media screen and (max-width: 1024px) {
     .ai-blogify-content-wrap {
         width: 100%;
