@@ -42,7 +42,6 @@ export const logout = async (req: Request, res: Response) => {
 // verify jwt Token
 export const verifyToken = async (req: Request, res: Response) => {
     const token = req.cookies.token;
-    logger.info(token);
 
     if (!token) {
         logger.info(`verifyToken:No token provided`);
