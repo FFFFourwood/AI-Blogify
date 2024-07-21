@@ -1,11 +1,38 @@
 import Article, { IArticle } from '../models/articleModel';
 import { FilterQuery, PaginateOptions, PaginateResult } from 'mongoose';
 
-const getAllArticles = async (): Promise<IArticle[]> => {
-    return Article.find().populate('author', 'username');
+const getAllArticles = async (page: number, limit: number): Promise<PaginateResult<IArticle>> => {
+    const options: PaginateOptions = {
+        page,
+        limit,
+        sort: { createdAt: -1 },
+        populate: 'author',
+    };
+
+    return Article.paginate({}, options);
 };
 
+const getArticlesByCategory = async (categoryId: string, page: number, limit: number): Promise<PaginateResult<IArticle>> => {
+    const options: PaginateOptions = {
+        page,
+        limit,
+        sort: { createdAt: -1 },
+        populate: 'author',
+    };
 
+    return Article.paginate({ categories: categoryId }, options);
+};
+
+const getArticlesByTag = async (tagId: string, page: number, limit: number): Promise<PaginateResult<IArticle>> => {
+    const options: PaginateOptions = {
+        page,
+        limit,
+        sort: { createdAt: -1 },
+        populate: 'author',
+    };
+
+    return Article.paginate({ tags: tagId }, options);
+};
 
 const getArticleById = async (id: string): Promise<IArticle | null> => {
     return Article.findById(id).populate('author', 'username');
@@ -42,10 +69,13 @@ const deleteArticle = async (id: string): Promise<IArticle | null> => {
     return article;
 };
 
+
 export default {
     getAllArticles,
     getArticleById,
     createArticle,
     updateArticle,
     deleteArticle,
+    getArticlesByCategory,
+    getArticlesByTag,
 };

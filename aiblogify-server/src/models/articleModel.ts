@@ -1,5 +1,6 @@
-import { Schema, model, Document, ObjectId } from 'mongoose';
+import { Schema, model, Document, ObjectId, PaginateModel } from 'mongoose';
 import { ArticleStatus, ArticleCardType } from '../utils/enum';
+import mongoosePaginate from 'mongoose-paginate-v2';
 
 export interface IArticle extends Document {
     title: string;
@@ -35,6 +36,8 @@ const articleSchema = new Schema<IArticle>({
     timestamps: true
 });
 
-const Article = model<IArticle>('Article', articleSchema);
+articleSchema.plugin(mongoosePaginate);
+
+const Article = model<IArticle, PaginateModel<IArticle>>('Article', articleSchema);
 
 export default Article;

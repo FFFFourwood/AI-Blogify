@@ -1,13 +1,16 @@
 import express from 'express';
-import { getAllArticles, getArticle, createArticle, updateArticle, deleteArticle } from '../controllers/articleController';
+import { getAllArticles, getArticle, createArticle, updateArticle, deleteArticle, getArticlesByCategory, getArticlesByTag } from '../controllers/articleController';
 import authMiddleware from '../middlewares/authMiddleware';
 
 const router = express.Router();
 
-router.get('/', getAllArticles);                        // 获取所有文章
-router.get('/:id', getArticle);                         // 获取单个文章
-router.post('/', authMiddleware, createArticle);        // 创建新文章
-router.put('/:id', authMiddleware, updateArticle);      // 更新文章
-router.delete('/:id', authMiddleware, deleteArticle);   // 删除文章
+router.get('/', getAllArticles);
+router.get('/category/:categoryId', getArticlesByCategory);
+router.get('/tag/:tagId', getArticlesByTag);
+router.get('/:id', getArticle);
+router.post('/', authMiddleware, createArticle);
+router.put('/:id', authMiddleware, updateArticle);
+router.delete('/:id', authMiddleware, deleteArticle);
+
 
 export default router;
