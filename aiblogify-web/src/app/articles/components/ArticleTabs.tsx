@@ -2,7 +2,7 @@ import * as React from "react";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
-import ArticleWrap from "./ArticleWrap";
+import AllArticlesWrap from "./AllArticlesWrap";
 
 interface TabPanelProps {
     children?: React.ReactNode;
@@ -44,7 +44,7 @@ export default function ArticleTabs() {
                 </Tabs>
             </Box>
             <ArticleTabPanel value={value} index={0}>
-                <ArticleWrap />
+                <AllArticlesWrap />
             </ArticleTabPanel>
             <ArticleTabPanel value={value} index={1}>
                 Item Two
