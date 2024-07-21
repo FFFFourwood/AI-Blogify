@@ -1,8 +1,11 @@
 import Article, { IArticle } from '../models/articleModel';
+import { FilterQuery, PaginateOptions, PaginateResult } from 'mongoose';
 
 const getAllArticles = async (): Promise<IArticle[]> => {
     return Article.find().populate('author', 'username');
 };
+
+
 
 const getArticleById = async (id: string): Promise<IArticle | null> => {
     return Article.findById(id).populate('author', 'username');
