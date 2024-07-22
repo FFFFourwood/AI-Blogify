@@ -23,7 +23,7 @@ const BigImgCard = (props: any) => {
     return (
         <Card sx={{ width: "100%" }} className="mb-5" variant="outlined">
             <CardActionArea>
-                <CardMedia component="img" image={props.coverImg} alt={props.title} sx={{ maxHeight: "400px", minHeight: "200px" }} className="transition transform duration-350 hover:scale-102 hover:opacity-85" />
+                <CardMedia component="img" image={props.coverImg} alt={props.title} className="transition transform duration-350 hover:scale-102 hover:opacity-85" />
                 <CardContent>
                     <Typography gutterBottom variant="h5" component="div">
                         {props.title}

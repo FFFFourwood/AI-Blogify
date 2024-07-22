@@ -25,8 +25,8 @@ export default function RootLayout({
                         <DialogProvider>
                             <div className="flex flex-col min-h-screen">
                                 <Header />
-                                <div className="flex flex-1 mt-16">
-                                    <main className="flex flex-1 p-4 justify-center">{children}</main>
+                                <div className="mt-16">
+                                    <main className="p-4">{children}</main>
                                 </div>
                                 <Footer />
                             </div>
