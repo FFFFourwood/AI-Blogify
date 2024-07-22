@@ -84,5 +84,6 @@ body {
 @media screen and (max-width: 1024px) {
     .ai-blogify-content-wrap {
         width: 100%;
+        max-width: 690px;
     }
 }

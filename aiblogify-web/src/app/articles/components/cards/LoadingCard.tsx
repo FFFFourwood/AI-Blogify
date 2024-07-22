@@ -16,9 +16,9 @@ const StyledTypography = styled(Typography)({
 
 export default function LoadingCard() {
     return (
-        <Card sx={{ width: "100%" }} className="mb-5 ai-blogify-article-card loading-card" variant="outlined">
+        <Card sx={{ width: "100%" }} className="mb-5 ai-blogify-article-card loading-card " variant="outlined">
             <CardActionArea>
-                <Skeleton variant="rounded" width={"100%"} className="ai-blogify-article-img-card" />
+                <Skeleton variant="rounded" width={"100%"} className="xl:h-[280px] lg:h-[240px] md:h-[180px] sm:h-[130]" />
                 <CardContent>
                     <Typography gutterBottom variant="h5" component="div">
                         <Skeleton />
