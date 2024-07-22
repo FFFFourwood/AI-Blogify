@@ -40,7 +40,7 @@ const initDatabase = async () => {
                 ]
             });
             const guestRole = new Role({
-                name: 'editor',
+                name: 'guest',
                 permissions: [
                     Permission.VIEW,
                 ]

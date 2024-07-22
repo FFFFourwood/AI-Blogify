@@ -14,9 +14,8 @@ export interface IArticle extends Document {
     views: number;
     likes: number;
     type: ArticleCardType,
-    categories: Schema.Types.ObjectId[];
-    tags: Schema.Types.ObjectId[];
     description: string;
+    coverImg: string;
 }
 
 const articleSchema = new Schema<IArticle>({
@@ -31,9 +30,8 @@ const articleSchema = new Schema<IArticle>({
     views: { type: Number, default: 0 },
     likes: { type: Number, default: 0 },
     type: { type: Number, default: ArticleCardType.DEFAULT },
-    categories: [{ type: Schema.Types.ObjectId, ref: 'Category' }],
-    tags: [{ type: Schema.Types.ObjectId, ref: 'Tag' }],
     description: { type: String, default: '' },
+    coverImg: { type: String, default: '' },
 }, {
     timestamps: true
 });

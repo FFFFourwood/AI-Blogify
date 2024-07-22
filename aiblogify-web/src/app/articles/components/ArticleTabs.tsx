@@ -35,7 +35,7 @@ export default function ArticleTabs() {
     };
 
     return (
-        <Box sx={{ width: "100%" }}>
+        <Box className="flex-1">
             <Box>
                 <Tabs value={value} onChange={handleChange}>
                     <Tab label="Latest" {...a11yProps(0)} />

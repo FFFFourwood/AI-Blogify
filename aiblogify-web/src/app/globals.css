@@ -54,6 +54,7 @@ body {
     display: block;
     width: calc(38.39vw + 582.9px);
     max-width: 1320px;
+    margin: 0 auto;
 }
 
 .ai-blogify-header {
@@ -83,5 +84,6 @@ body {
 @media screen and (max-width: 1024px) {
     .ai-blogify-content-wrap {
         width: 100%;
+        max-width: 690px;
     }
 }

@@ -32,10 +32,10 @@ const MoreImgCard = (props: any) => {
                     </Typography>
                     <Box sx={{ flexGrow: 1 }} className="mt-5 mb-2">
                         <Grid container spacing={1}>
-                            {props.images.map((card: string) => {
+                            {props.images.slice(0, 3).map((card: string) => {
                                 return (
                                     <Grid xs={4} key={card}>
-                                        <CardMedia component="img" image={card} alt={props.title} sx={{ maxHeight: "100%", minHeight: "100%" }} className="transition transform duration-350 hover:scale-102 hover:opacity-85" />
+                                        <CardMedia component="img" image={card} alt={props.title} className="transition transform duration-350 hover:scale-102 hover:opacity-85" />
                                     </Grid>
                                 );
                             })}

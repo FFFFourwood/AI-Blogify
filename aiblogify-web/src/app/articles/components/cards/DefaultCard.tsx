@@ -30,7 +30,7 @@ const DefaultCard = (props: any) => {
         <Card sx={{ width: "100%" }} className="mb-5" variant="outlined">
             <CardActionArea>
                 <Box className="flex flex-row">
-                    <CardMedia component="img" image={imgSrc} alt={props.title} sx={{ width: { xs: "30%", md: "27%" } }} className="transition transform duration-350 hover:scale-102 hover:opacity-85" />
+                    <CardMedia component="img" image={imgSrc} alt={props.title} className="transition transform duration-350 hover:scale-102 hover:opacity-85" />
                     <CardContent className="flex flex-col">
                         <Typography gutterBottom variant="h5" component="div">
                             {props.title}

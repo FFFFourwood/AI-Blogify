@@ -15,6 +15,7 @@ interface IArticleCardProps {
     categary: Array<string>;
     likeCount: number;
     cardType: ArticleCardType;
+    coverImg: string;
 }
 
 export default function ArticleCard(cardData: IArticleCardProps) {

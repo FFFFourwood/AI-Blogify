@@ -11,11 +11,13 @@ export interface IImage extends Document {
 
 const imageSchema = new Schema<IImage>({
     url: { type: String, required: true },
-    article: { type: Schema.Types.ObjectId, ref: 'Article', required: true },
+    article: { type: Schema.Types.ObjectId, ref: 'Article' },
     createdAt: { type: Date, default: Date.now },
     title: { type: String, default: '' },
     views: { type: Number, default: 0 },
     likes: { type: Number, default: 0 },
+}, {
+    timestamps: true
 });
 
 const Image = model<IImage>('Image', imageSchema);
