@@ -5,7 +5,6 @@ import Image from '../models/imageModel';
 import { ObjectId } from 'bson';
 
 const aggregateArticles = async (filter: FilterQuery<IArticle>, page: number, limit: number): Promise<any> => {
-    console.log('Filter:', filter);
     const articles = await Article.aggregate([
         { $match: filter },
         { $sort: { createdAt: -1 } },
@@ -44,7 +43,8 @@ const aggregateArticles = async (filter: FilterQuery<IArticle>, page: number, li
                 categories: 1,
                 tags: 1,
                 description: 1,
-                images: { url: 1 } // Only include image URLs
+                coverImg: 1,
+                images: { $map: { input: "$images", as: "image", in: "$$image.url" } }
             }
         }
     ]).exec();

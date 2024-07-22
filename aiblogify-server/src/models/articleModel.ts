@@ -17,6 +17,7 @@ export interface IArticle extends Document {
     categories: Schema.Types.ObjectId[];
     tags: Schema.Types.ObjectId[];
     description: string;
+    coverImg: string;
 }
 
 const articleSchema = new Schema<IArticle>({
@@ -34,6 +35,7 @@ const articleSchema = new Schema<IArticle>({
     categories: [{ type: Schema.Types.ObjectId, ref: 'Category' }],
     tags: [{ type: Schema.Types.ObjectId, ref: 'Tag' }],
     description: { type: String, default: '' },
+    coverImg: { type: String, default: '' },
 }, {
     timestamps: true
 });
