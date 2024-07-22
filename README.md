@@ -8,7 +8,13 @@ AI Blogify is a powerful personal blogging system integrated with AI
 ###### Supported Features
 - [x] start project 
 ###### Working on it!
-- [ ]  Write, View, Edit, Delete articles for basic blog system fetures 
+- [ ]  View Articles
+- [ ]  Article Home
+- [ ]  Article List
+- [ ]  Article Details
+- [ ]  Create Articles
+- [ ]  Edit Articles
+- [ ]  Delete Articles
 
 
 ### Development Logs
@@ -18,3 +24,4 @@ AI Blogify is a powerful personal blogging system integrated with AI
 - 2024-07-19 : add Auth & Theme & Login & Lougout & Avatar
 - 2024-07-20 : add Permission Verify & Header Permission $ article home UI
 - 2024-07-21 : add article list & article card UI 
+- 2024-07-22 : add article home UI & finish migration tool
