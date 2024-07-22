@@ -20,14 +20,10 @@ const StyledTypography = styled(Typography)({
     WebkitLineClamp: 3,
 });
 const BigImgCard = (props: any) => {
-    let imgSrc = "";
-    if (props.images && props.images.length > 0) {
-        imgSrc = props?.images[0];
-    }
     return (
         <Card sx={{ width: "100%" }} className="mb-5" variant="outlined">
             <CardActionArea>
-                <CardMedia component="img" image={imgSrc} alt={props.title} sx={{ maxHeight: "400px", minHeight: "200px" }} className="transition transform duration-350 hover:scale-102 hover:opacity-85" />
+                <CardMedia component="img" image={props.coverImg} alt={props.title} sx={{ maxHeight: "400px", minHeight: "200px" }} className="transition transform duration-350 hover:scale-102 hover:opacity-85" />
                 <CardContent>
                     <Typography gutterBottom variant="h5" component="div">
                         {props.title}
