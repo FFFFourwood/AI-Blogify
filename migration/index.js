@@ -49,8 +49,35 @@ const imageSchema = new mongoose.Schema({
     timestamps: true
 });
 
+const categorySchema = new mongoose.Schema({
+    name: { type: String, required: true, unique: true },
+    slug: { type: String, required: true, unique: true },
+});
+
+const tagSchema = new mongoose.Schema({
+    name: { type: String, required: true, unique: true },
+    slug: { type: String, required: true, unique: true },
+});
+const articleCategorySchema = new mongoose.Schema({
+    articleId: { type: mongoose.Schema.Types.ObjectId, ref: 'Articles', required: true },
+    categoryId: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true },
+});
+
+const articleTagSchema = new mongoose.Schema({
+    articleId: { type: mongoose.Schema.Types.ObjectId, ref: 'Articles', required: true },
+    tagId: { type: mongoose.Schema.Types.ObjectId, ref: 'Tag', required: true },
+});
+
+
+
+
 const Articles = mongoose.model('Articles', articleSchema);
 const Images = mongoose.model('Images', imageSchema);
+const Categories = mongoose.model('Categories', categorySchema);
+const Tags = mongoose.model('Tags', tagSchema);
+const ArticleCategory = mongoose.model('ArticleCategory', articleCategorySchema);
+const ArticleTag = mongoose.model('ArticleTag', articleTagSchema);
+
 
 const mysqlConnection = mysql.createConnection(mysqlConfig);
 
@@ -150,6 +177,102 @@ const getFieldDataFromMySQL = () => {
     });
 };
 
+const getCategoryAndTagDataFromMySQL = () => {
+    return new Promise((resolve, reject) => {
+        mysqlConnection.query('SELECT * FROM ffffourwood_metas', (err, results) => {
+            if (err) {
+                reject('Error fetching data from MySQL:', err);
+            } else {
+                resolve(results);
+            }
+        });
+    });
+};
+
+const migrateCategoriesAndTags = async () => {
+    const metas = await getCategoryAndTagDataFromMySQL();
+
+    // Filter and transform categories
+    const categories = metas.filter(meta => meta.type === 'category' && meta.parent === 0).map(meta => ({
+        name: meta.name,
+        slug: meta.slug
+    }));
+
+    // Insert categories
+    const insertedCategories = await Categories.insertMany(categories);
+    console.log('Categories Data migrated successfully');
+
+    // Filter and transform tags
+    const tags = metas.filter(meta => meta.type === 'tag').map(meta => ({
+        name: meta.name,
+        slug: meta.slug
+    }));
+
+    // Insert tags
+    const insertedTags = await Tags.insertMany(tags);
+    console.log('Tags Data migrated successfully');
+
+    // Create a mapping of meta id to category and tag object ids
+    const categoryMap = {};
+    insertedCategories.forEach(category => {
+        const meta = metas.find(meta => meta.name === category.name && meta.slug === category.slug);
+        if (meta) {
+            categoryMap[meta.mid] = category._id;
+        }
+    });
+
+    const tagMap = {};
+    insertedTags.forEach(tag => {
+        const meta = metas.find(meta => meta.name === tag.name && meta.slug === tag.slug);
+        if (meta) {
+            tagMap[meta.mid] = tag._id;
+        }
+    });
+
+    return { categoryMap, tagMap };
+};
+
+const getRelationshipsFromMySQL = () => {
+    return new Promise((resolve, reject) => {
+        mysqlConnection.query('SELECT * FROM ffffourwood_relationships', (err, results) => {
+            if (err) {
+                reject('Error fetching data from MySQL:', err);
+            } else {
+                resolve(results);
+            }
+        });
+    });
+};
+
+const migrateRelationships = async (categoryMap, tagMap) => {
+    const relationships = await getRelationshipsFromMySQL();
+
+    for (const relationship of relationships) {
+        const article = await Articles.findOne({ migrateCid: relationship.cid });
+
+        if (!article) continue;
+
+        const categoryId = categoryMap[relationship.mid];
+        const tagId = tagMap[relationship.mid];
+
+        if (categoryId) {
+            await ArticleCategory.create({
+                articleId: article._id,
+                categoryId: categoryId
+            });
+        }
+
+        if (tagId) {
+            await ArticleTag.create({
+                articleId: article._id,
+                tagId: tagId
+            });
+        }
+    }
+
+    console.log('Relationships migrated successfully');
+};
+
 const migrateData = async () => {
     try {
         await mongoose.connect(mongoConfig.url);
@@ -236,7 +359,6 @@ const migrateData = async () => {
                     }
                     const existingImage = await Images.findOne({ url });
                     if (!existingImage) {
-                        console.log(url)
                         await Images.create({
                             url,
                             article: article._id,
@@ -252,6 +374,13 @@ const migrateData = async () => {
 
             console.log('Additional Images Data migrated successfully');
 
+            // Migrate categories and tags
+            const { categoryMap, tagMap } = await migrateCategoriesAndTags();
+
+            // Migrate relationships
+            await migrateRelationships(categoryMap, tagMap);
+
+            console.log('Migration completed successfully');
             mongoose.connection.close();
             mysqlConnection.end();
         });
