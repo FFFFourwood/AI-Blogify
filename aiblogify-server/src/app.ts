@@ -7,7 +7,7 @@ import errorHandler from './middlewares/errorHandler';
 import articleRoutes from './routes/articleRoutes';
 import authRoutes from './routes/authRoutes';
 import userRoutes from './routes/userRoutes';
-import openaiRoutes from './routes/openaiRoutes';
+import openaiRoutes from './routes/openAIRoutes';
 import reportRoutes from './routes/reportRoutes';
 import auditRoutes from './routes/auditRoutes';
 import cookieParser from 'cookie-parser';

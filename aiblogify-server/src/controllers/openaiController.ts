@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import openaiService from '../services/openaiService';
+import openaiService from '../services/openAIService';
 
 export const generateText = async (req: Request, res: Response) => {
     try {
