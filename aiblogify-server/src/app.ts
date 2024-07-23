@@ -13,6 +13,7 @@ import auditRoutes from './routes/auditRoutes';
 import cookieParser from 'cookie-parser';
 // import './config/passport';
 import loadEnvironmentVariables from './config/loadEnv';
+import './cron/resetDailyUsage'
 loadEnvironmentVariables();
 const app = express();
 
