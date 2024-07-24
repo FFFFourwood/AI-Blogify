@@ -2,7 +2,6 @@ import axios from 'axios';
 import { ApiToken, IApiToken, UsageLog } from '../models/openAIModel';
 import logger from '../utils/logger';
 
-
 class OpenAIService {
     private static instance: OpenAIService;
 
@@ -21,19 +20,19 @@ class OpenAIService {
         if (!tokenRecord) {
             throw new Error('Invalid API token');
         }
-        // 检查每日限额
+        // Check daily limit
         if (tokenRecord.usedToday >= tokenRecord.dailyLimit) {
             logger.info('openai service:Daily limit exceeded')
             throw new Error('Daily limit exceeded');
         }
 
-        // 检查总限额
+        // Check total limit
         if (tokenRecord.usedTotal >= tokenRecord.totalLimit) {
             logger.info('openai service:Total limit exceeded')
             throw new Error('Total limit exceeded');
         }
         try {
-            // 调用 OpenAI API
+            // Use the OpenAI API.
             const response = await axios.post(`${tokenRecord.apiUrl}/v1/chat/completions`, prompt, {
                 headers: {
                     'Authorization': `Bearer ${tokenRecord.token}`
@@ -47,7 +46,7 @@ class OpenAIService {
             logger.info('openai service:usage total:' + tokenRecord.usedTotal)
             await tokenRecord.save();
 
-            // 记录使用日志
+            // Record usage log
             await UsageLog.create({
                 tokenRefId: tokenRecord._id,
                 token: tokenRecord.token,

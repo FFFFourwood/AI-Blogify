@@ -1,18 +1,25 @@
 import { ObjectId } from 'mongoose';
 import Category, { ICategory } from '../models/categoryModel';
 
-// 创建分类，如果 name 存在则返回已存在的分类
-export const createCategory = async (name: string): Promise<ICategory | null> => {
-    const slug = name.trim().replace(/\s+/g, '-').toLowerCase();
-    const existingCategory = await Category.findOne({ name });
-    if (existingCategory) {
-        return existingCategory;
+// Create a category, return the existing category if the name exists.
+export const createCategories = async (names: string[]): Promise<ICategory[]> => {
+    const categories: ICategory[] = [];
+
+    for (const name of names) {
+        const slug = name.trim().replace(/\s+/g, '-').toLowerCase();
+        let existingCategory = await Category.findOne({ name });
+        if (existingCategory) {
+            categories.push(existingCategory);
+        } else {
+            const newCategory = await Category.create({ name, slug });
+            categories.push(newCategory);
+        }
     }
-    const category = await Category.create({ name, slug });
-    return category;
+
+    return categories;
 };
 
-// 更新分类，根据 ID 更新分类名称和 slug
+// Update category, update category name and slug according to ID.
 export const updateCategory = async (categoryId: ObjectId, name: string): Promise<ICategory | null> => {
     const slug = name.trim().replace(/\s+/g, '-').toLowerCase();
     const category = await Category.findByIdAndUpdate(
@@ -23,7 +30,7 @@ export const updateCategory = async (categoryId: ObjectId, name: string): Promis
     return category;
 };
 
-// 删除分类，根据 ID 删除分类
+// Delete category, delete category by ID.
 export const deleteCategory = async (categoryId: ObjectId): Promise<{ message: string }> => {
     const result = await Category.findByIdAndDelete(categoryId);
     if (!result) {
@@ -32,13 +39,13 @@ export const deleteCategory = async (categoryId: ObjectId): Promise<{ message: s
     return { message: 'Category deleted successfully' };
 };
 
-// 查询所有分类
+// Query all categories
 export const getAllCategories = async (): Promise<ICategory[]> => {
     const categories = await Category.find();
     return categories;
 };
 
-// 查询单个分类，根据 ID 查询分类
+// Query a single category, query the category by ID.
 export const getCategoryById = async (categoryId: ObjectId): Promise<ICategory | null> => {
     const category = await Category.findById(categoryId);
     return category;

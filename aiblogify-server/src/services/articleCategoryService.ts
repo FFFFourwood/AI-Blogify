@@ -3,7 +3,7 @@ import Article from '../models/articleModel';
 import Category from '../models/categoryModel';
 import ArticleCategory from '../models/articleCategoryModel';
 
-export const addCategoriesToArticle = async (articleId: ObjectId, categoryIds: ObjectId[]) => {
+export const addCategoriesToArticle = async (articleId: string, categoryIds: string[]) => {
     const article = await Article.findById(articleId);
     if (!article) {
         throw new Error('Article not found');

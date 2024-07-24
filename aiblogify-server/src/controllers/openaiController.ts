@@ -3,8 +3,9 @@ import OpenAIService from '../services/openAIService';
 import Article from '../models/articleModel';
 import { OPENAI_MODEL } from '../utils/constants';
 import logger from '../utils/logger';
-import { log } from 'console';
 
+import * as categoryService from '../services/categoryService';
+import * as articleCategoryService from '../services/articleCategoryService';
 const formatReqData = (prompt: string, msg: string) => {
     return {
         "model": OPENAI_MODEL,
@@ -36,9 +37,20 @@ export const generateBlogBasicInfo = async (req: Request, res: Response) => {
             return res.status(200).json({ result: false, message: 'Error generating text', error: 'Error generating text' });
         }
         logger.info('successfully generated blog info by openai service ')
+        const openaiRes = JSON.parse(responseContent)
+        const categories = await categoryService.createCategories(openaiRes.categories)
+        logger.info('successfully created categories by openai service ')
+        await articleCategoryService.addCategoriesToArticle(id, categories.map(category => category._id));
+        logger.info('successfully added categories to article by openai service ')
+
         res.json({
             result: true,
-            data: JSON.parse(responseContent)
+            data: {
+                name: openaiRes.name,
+                description: openaiRes.description,
+                tags: [],
+                categories: categories
+            }
         });
     } catch (error) {
         logger.error('Error generating blog info');
