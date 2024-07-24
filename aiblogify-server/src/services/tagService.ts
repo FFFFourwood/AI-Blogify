@@ -5,16 +5,35 @@ import Tag, { ITag } from '../models/tagModel';
 export const createTags = async (names: string[]): Promise<ITag[]> => {
     const tags: ITag[] = [];
 
-    for (const name of names) {
+    const promises = names.map(async (name) => {
         const slug = name.trim().replace(/\s+/g, '-').toLowerCase();
-        let existingTag = await Tag.findOne({ slug });
-        if (existingTag) {
-            tags.push(existingTag);
-        } else {
-            const newTag = await Tag.create({ name, slug });
-            tags.push(newTag);
+        try {
+            let existingTag = await Tag.findOne({ slug });
+            if (existingTag) {
+                return existingTag;
+            } else {
+                const newTag = await Tag.create({ name, slug });
+                return newTag;
+            }
+        } catch (error) {
+            if (error.code === 11000) {
+                const existingTag = await Tag.findOne({ slug });
+                return existingTag;
+            } else {
+                throw error;
+            }
         }
-    }
+
+    });
+
+    const results = await Promise.all(promises);
+
+    results.forEach(tag => {
+        if (tag && !tags.some(c => c._id.equals(tag._id))) {
+            tags.push(tag);
+        }
+    });
+
 
     return tags;
 };

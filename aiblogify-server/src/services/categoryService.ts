@@ -6,16 +6,32 @@ import Category, { ICategory } from '../models/categoryModel';
 export const createCategories = async (names: string[]): Promise<ICategory[]> => {
     const categories: ICategory[] = [];
 
-    for (const name of names) {
+    const promises = names.map(async (name) => {
         const slug = name.trim().replace(/\s+/g, '-').toLowerCase();
-        let existingCategory = await Category.findOne({ slug });
-        if (existingCategory) {
-            categories.push(existingCategory);
-        } else {
-            const newCategory = await Category.create({ name, slug });
-            categories.push(newCategory);
+        try {
+            let existingCategory = await Category.findOne({ slug });
+            if (existingCategory) {
+                return existingCategory;
+            } else {
+                const newCategory = await Category.create({ name, slug });
+                return newCategory;
+            }
+        } catch (error) {
+            if (error.code === 11000) {
+                const existingCategory = await Category.findOne({ slug });
+                return existingCategory;
+            } else {
+                throw error;
+            }
         }
-    }
+    });
+
+    const results = await Promise.all(promises);
+    results.forEach(category => {
+        if (category && !categories.some(c => c._id.equals(category._id))) {
+            categories.push(category);
+        }
+    });
 
     return categories;
 };

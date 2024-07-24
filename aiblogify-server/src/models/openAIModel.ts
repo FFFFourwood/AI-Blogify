@@ -13,8 +13,8 @@ export interface IApiToken extends Document {
 
 const apiTokenSchema = new Schema<IApiToken>({
     token: { type: String, required: true, unique: true },
-    dailyLimit: { type: Number, default: 100000 },
-    totalLimit: { type: Number, default: 10000000 },
+    dailyLimit: { type: Number, default: 500000 },
+    totalLimit: { type: Number, default: 100000000 },
     usedToday: { type: Number, default: 0 },
     usedTotal: { type: Number, default: 0 },
     resetDate: { type: Date, default: Date.now },
