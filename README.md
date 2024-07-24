@@ -25,3 +25,4 @@ AI Blogify is a powerful personal blogging system integrated with AI
 - 2024-07-20 : add Permission Verify & Header Permission $ article home UI
 - 2024-07-21 : add article list & article card UI 
 - 2024-07-22 : add article home UI & finish migration tool
+- 2024-07-23 : corn & open ai service
