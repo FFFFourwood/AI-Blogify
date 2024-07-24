@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { ApiToken, IApiToken, UsageLog } from '../models/openAIModel';
+import logger from '../utils/logger';
 
 
 class OpenAIService {
@@ -14,46 +15,63 @@ class OpenAIService {
         return OpenAIService.instance;
     }
 
-    async callOpenAI(prompt: string): Promise<any> {
+    async callOpenAI(prompt: any): Promise<any> {
         const tokenRecord = await ApiToken.findOne({ isDefault: true });
 
         if (!tokenRecord) {
             throw new Error('Invalid API token');
         }
-
         // 检查每日限额
         if (tokenRecord.usedToday >= tokenRecord.dailyLimit) {
+            logger.info('openai service:Daily limit exceeded')
             throw new Error('Daily limit exceeded');
         }
 
         // 检查总限额
         if (tokenRecord.usedTotal >= tokenRecord.totalLimit) {
+            logger.info('openai service:Total limit exceeded')
             throw new Error('Total limit exceeded');
         }
+        try {
+            // 调用 OpenAI API
+            const response = await axios.post(`${tokenRecord.apiUrl}/v1/chat/completions`, prompt, {
+                headers: {
+                    'Authorization': `Bearer ${tokenRecord.token}`
+                }
+            });
+            const usage = response.data.usage.total_tokens;
+            tokenRecord.usedToday += usage;
+            tokenRecord.usedTotal += usage;
+            logger.info('openai service:usage:' + usage)
+            logger.info('openai service:usage today:' + tokenRecord.usedToday)
+            logger.info('openai service:usage total:' + tokenRecord.usedTotal)
+            await tokenRecord.save();
 
-        // 调用 OpenAI API
-        const response = await axios.post(`${tokenRecord.apiUrl}/v1/chat/completions`, {
-            prompt,
-        }, {
-            headers: {
-                'Authorization': `Bearer ${tokenRecord.token}`
+            // 记录使用日志
+            await UsageLog.create({
+                tokenRefId: tokenRecord._id,
+                token: tokenRecord.token,
+                date: new Date(),
+                usage,
+            });
+
+            return response.data;
+        } catch (error: any) {
+            if (error.response) {
+                logger.error(`openai service:error:AxiosError: ${error.response.status} - ${error.response.statusText}`);
+                logger.error(`openai service:error:Response Data: ${JSON.stringify(error.response.data)}`);
+            } else if (error.request) {
+                logger.error('openai service:error:No response received from OpenAI API');
+            } else {
+                logger.error('openai service:error:Error setting up the request: ' + error.message);
             }
-        });
+            return {
+                result: false,
+                message: 'Error generating blog info by openAI service',
+                error: error.message
+            }
+        }
 
-        const usage = response.data.usage.total_tokens;
-        tokenRecord.usedToday += usage;
-        tokenRecord.usedTotal += usage;
-        await tokenRecord.save();
-
-        // 记录使用日志
-        await UsageLog.create({
-            tokenRefId: tokenRecord._id,
-            token: tokenRecord.token,
-            date: new Date(),
-            usage,
-        });
-
-        return response.data;
     }
 
     async resetDailyUsage() {
