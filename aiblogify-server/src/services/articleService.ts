@@ -18,6 +18,62 @@ const aggregateArticles = async (filter: FilterQuery<IArticle>, page: number, li
                 as: 'images'
             }
         },
+        {
+            $lookup: {
+                from: 'articlecategories',
+                localField: '_id',
+                foreignField: 'articleId',
+                as: 'articlecategories'
+            }
+        },
+        {
+            $lookup: {
+                from: 'articletags',
+                localField: '_id',
+                foreignField: 'articleId',
+                as: 'articletags'
+            }
+        },
+        {
+            $unwind: {
+                path: '$articletags',
+                preserveNullAndEmptyArrays: true
+            }
+        },
+        {
+            $unwind: {
+                path: '$articlecategories',
+                preserveNullAndEmptyArrays: true
+            }
+        },
+        {
+            $lookup: {
+                from: 'categories',
+                localField: 'articlecategories.categoryId',
+                foreignField: '_id',
+                as: 'categories'
+            }
+        },
+        {
+            $lookup: {
+                from: 'tags',
+                localField: 'articletags.tagId',
+                foreignField: '_id',
+                as: 'tags'
+            }
+        },
+        {
+            $unwind: {
+                path: '$categories',
+                preserveNullAndEmptyArrays: true
+            }
+        },
+        {
+            $unwind: {
+                path: '$tags',
+                preserveNullAndEmptyArrays: true
+            }
+        },
         // {
         //     $lookup: {
         //         from: 'users',
@@ -27,11 +83,33 @@ const aggregateArticles = async (filter: FilterQuery<IArticle>, page: number, li
         //     }
         // },
         // { $unwind: '$author' }, // Unwind author array
+
+        {
+            $group: {
+                _id: '$_id',
+                title: { $first: '$title' },
+                content: { $first: '$content' },
+                createdAt: { $first: '$createdAt' },
+                updatedAt: { $first: '$updatedAt' },
+                slug: { $first: '$slug' },
+                status: { $first: '$status' },
+                commentsCounts: { $first: '$commentsCounts' },
+                views: { $first: '$views' },
+                likes: { $first: '$likes' },
+                type: { $first: '$type' },
+                description: { $first: '$description' },
+                coverImg: { $first: '$coverImg' },
+                images: { $first: { $map: { input: "$images", as: "image", in: "$$image.url" } } },
+                categories: { $addToSet: '$categories' },
+                tags: { $addToSet: '$tags' },
+            }
+        },
         {
             $project: {
                 title: 1,
                 content: 1,
-                // author: { username: 1, email: 1 }, // Include only specific fields from author
+                categories: 1,
+                tags: 1,
                 createdAt: 1,
                 updatedAt: 1,
                 slug: 1,
@@ -40,12 +118,13 @@ const aggregateArticles = async (filter: FilterQuery<IArticle>, page: number, li
                 views: 1,
                 likes: 1,
                 type: 1,
-                categories: 1,
-                tags: 1,
                 description: 1,
                 coverImg: 1,
-                images: { $map: { input: "$images", as: "image", in: "$$image.url" } }
+                images: 1,
             }
+        },
+        {
+            $sort: { createdAt: -1 } // 再次按照创建时间进行排序
         }
     ]).exec();
 
