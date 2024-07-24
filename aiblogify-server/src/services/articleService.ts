@@ -1,5 +1,5 @@
 import Article, { IArticle } from '../models/articleModel';
-import { FilterQuery, PaginateOptions, PaginateResult } from 'mongoose';
+import { FilterQuery } from 'mongoose';
 import { extractImageUrls } from '../utils/utils';
 import Image from '../models/imageModel';
 import { ObjectId } from 'bson';
