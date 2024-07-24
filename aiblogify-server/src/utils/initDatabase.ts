@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import logger from './logger';
 import User from '../models/userModel';
 import Role from '../models/roleModel';
+import { ApiToken } from '../models/openAIModel';
 import { Permission } from '../config/permissions';
 import loadEnvironmentVariables from '../config/loadEnv';
 loadEnvironmentVariables();
@@ -69,6 +70,20 @@ const initDatabase = async () => {
             logger.info('Admin user created.');
         } else {
             logger.info('Admin user already exists.');
+        }
+
+        const openAIApiKey = process.env.OPENAI_API_KEY;
+        const openAIApiUrl = process.env.OPENAI_API_URL;
+
+        if (openAIApiKey && openAIApiUrl) {
+            const openAIData = new ApiToken({
+                token: openAIApiKey,
+                name: 'default',
+                apiUrl: openAIApiUrl,
+                isDefault:true
+            })
+            await openAIData.save();
+            logger.info('OpenAI API key and URL saved to database.');
         }
     } catch (error) {
         logger.error('Error initializing database:', error);

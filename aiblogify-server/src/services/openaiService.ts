@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { ApiToken, IApiToken, UsageLog } from '../models/openAIModel';
-import { Types } from 'mongoose';
+
 
 class OpenAIService {
     private static instance: OpenAIService;
@@ -14,8 +14,8 @@ class OpenAIService {
         return OpenAIService.instance;
     }
 
-    async callOpenAI(apiToken: string, prompt: string): Promise<any> {
-        const tokenRecord = await ApiToken.findOne({ token: apiToken });
+    async callOpenAI(prompt: string): Promise<any> {
+        const tokenRecord = await ApiToken.findOne({ isDefault: true });
 
         if (!tokenRecord) {
             throw new Error('Invalid API token');
@@ -32,12 +32,11 @@ class OpenAIService {
         }
 
         // 调用 OpenAI API
-        const response = await axios.post('https://api.openai.com/v1/engines/davinci-codex/completions', {
+        const response = await axios.post(`${tokenRecord.apiUrl}/v1/chat/completions`, {
             prompt,
-            max_tokens: 50
         }, {
             headers: {
-                'Authorization': `Bearer ${apiToken}`
+                'Authorization': `Bearer ${tokenRecord.token}`
             }
         });
 
@@ -48,7 +47,8 @@ class OpenAIService {
 
         // 记录使用日志
         await UsageLog.create({
-            token: tokenRecord._id,
+            tokenRefId: tokenRecord._id,
+            token: tokenRecord.token,
             date: new Date(),
             usage,
         });
