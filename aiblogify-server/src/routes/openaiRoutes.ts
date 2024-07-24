@@ -4,7 +4,7 @@ import authMiddleware from '../middlewares/authMiddleware';
 
 const router = express.Router();
 
-router.post('/', authMiddleware, fn());
-});
+// router.post('/', authMiddleware, fn());
+// });
 
 export default router;
