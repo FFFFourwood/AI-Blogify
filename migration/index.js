@@ -1,8 +1,8 @@
 const mysql = require('mysql2');
 const mongoose = require('mongoose');
-
-// MySQL configuration
-
+const apiUrl = 'http://127.0.0.1:3033/api';
+const axios = require('axios');
+const cookie = 'token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NmEwYzVkYjU0MTJmNmZhY2E4OWUzOTEiLCJpYXQiOjE3MjE4MTI0NDgsImV4cCI6MTcyMjA3MTY0OH0.bWDipOPXMo9YcfxOvwCQ0LzIsXtUPgqaO4busSI1nHo'
 const mysqlConfig = {
     host: '',
     user: '',
@@ -273,6 +273,32 @@ const migrateRelationships = async (categoryMap, tagMap) => {
     console.log('Relationships migrated successfully');
 };
 
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+const updateArticleBasicInfo = async () => {
+    const articles = await Articles.find();
+    const totalArticles = articles.length;
+    console.log(`Total articles to process: ${totalArticles}`);
+
+    for (let i = 0; i < totalArticles; i++) {
+        const article = articles[i];
+        console.log(`Processing ${i + 1} of ${totalArticles} , Article ID: ${article._id}`);
+
+        try {
+            await axios.get(`${apiUrl}/openai/generateBlogInfo/${article._id}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Cookie': cookie
+                }
+            });
+        } catch (error) {
+            console.log(error);
+        }
+        await delay(20); // Adjust the delay duration as needed
+    }
+
+    console.log('All articles processed');
+};
 const migrateData = async () => {
     try {
         await mongoose.connect(mongoConfig.url);
@@ -379,6 +405,10 @@ const migrateData = async () => {
 
             // Migrate relationships
             await migrateRelationships(categoryMap, tagMap);
+            console.log('Migration SQL data successfully');
+
+            //update article basic info
+            await updateArticleBasicInfo();
 
             console.log('Migration completed successfully');
             mongoose.connection.close();
