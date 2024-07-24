@@ -33,7 +33,7 @@ export const removeCategoriesFromArticle = async (articleId: ObjectId, categoryI
     return { message: 'Categories removed successfully' };
 };
 
-export const updateCategoriesForArticle = async (articleId: ObjectId, newCategoryIds: ObjectId[]) => {
+export const updateCategoriesForArticle = async (articleId: string, newCategoryIds: string[]) => {
     await ArticleCategory.deleteMany({ articleId });
     return await addCategoriesToArticle(articleId, newCategoryIds);
 };

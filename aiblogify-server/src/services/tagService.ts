@@ -7,7 +7,7 @@ export const createTags = async (names: string[]): Promise<ITag[]> => {
 
     for (const name of names) {
         const slug = name.trim().replace(/\s+/g, '-').toLowerCase();
-        let existingTag = await Tag.findOne({ name });
+        let existingTag = await Tag.findOne({ slug });
         if (existingTag) {
             tags.push(existingTag);
         } else {

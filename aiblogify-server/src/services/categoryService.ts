@@ -2,12 +2,13 @@ import { ObjectId } from 'mongoose';
 import Category, { ICategory } from '../models/categoryModel';
 
 // Create a category, return the existing category if the name exists.
+
 export const createCategories = async (names: string[]): Promise<ICategory[]> => {
     const categories: ICategory[] = [];
 
     for (const name of names) {
         const slug = name.trim().replace(/\s+/g, '-').toLowerCase();
-        let existingCategory = await Category.findOne({ name });
+        let existingCategory = await Category.findOne({ slug });
         if (existingCategory) {
             categories.push(existingCategory);
         } else {

@@ -6,6 +6,8 @@ import logger from '../utils/logger';
 
 import * as categoryService from '../services/categoryService';
 import * as articleCategoryService from '../services/articleCategoryService';
+import * as tagService from '../services/tagService';
+import * as articleTagService from '../services/articleTagService';
 const formatReqData = (prompt: string, msg: string) => {
     return {
         "model": OPENAI_MODEL,
@@ -42,13 +44,17 @@ export const generateBlogBasicInfo = async (req: Request, res: Response) => {
         logger.info('successfully created categories by openai service ')
         await articleCategoryService.addCategoriesToArticle(id, categories.map(category => category._id));
         logger.info('successfully added categories to article by openai service ')
+        const tags = await tagService.createTags(openaiRes.tags)
+        logger.info('successfully created tags by openai service ')
+        await articleTagService.addTagsToArticle(id, tags.map(tag => tag._id));
+        logger.info('successfully added tags to article by openai service ')
 
         res.json({
             result: true,
             data: {
                 name: openaiRes.name,
                 description: openaiRes.description,
-                tags: [],
+                tags: tags,
                 categories: categories
             }
         });
