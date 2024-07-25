@@ -8,6 +8,7 @@ import { stripMarkdown } from "@/utils/util";
 import moment from "moment";
 import LoadingCard from "./cards/LoadingCard";
 import InfiniteScroll from "react-infinite-scroller";
+import { v4 as uuidv4 } from "uuid";
 const AllArticlesWrap = () => {
     const [initLoading, setInitLoading] = useState(true);
     const [articles, setArticles] = useState([]);
@@ -36,16 +37,16 @@ const AllArticlesWrap = () => {
 
     return (
         <div>
-            {initLoading && <LoadingCard />}
-            {initLoading && <LoadingCard />}
+            {initLoading && <LoadingCard key={uuidv4()} />}
+            {initLoading && <LoadingCard key={uuidv4()} />}
             {!initLoading && articles?.length == 0 && <div>No articles found.</div>}
             {!initLoading && articles?.length > 0 && (
-                <InfiniteScroll pageStart={1} loadMore={getMoreData} hasMore={hasMore} threshold={20} loader={<LoadingCard />}>
+                <InfiniteScroll pageStart={1} loadMore={getMoreData} hasMore={hasMore} threshold={20} loader={<LoadingCard key={uuidv4()} />} key={uuidv4()}>
                     {articles.map((v: any, i) => {
                         const desc = v.description || stripMarkdown(v.content);
                         const date = moment(v.createdAt).format("YYYY-MM-DD");
                         const type = v.type == ArticleCardType.DEFAULT && v.images?.length < 1 ? ArticleCardType.NOIMG : v.type;
-                        return <ArticleCard key={v._id} title={v.title} description={desc} images={v.images} date={date} readCount={v.views} commentsCount={v.commentsCounts} categary={v.categories} likeCount={v.likes} cardType={type} coverImg={v.coverImg} />;
+                        return <ArticleCard key={uuidv4()} title={v.title} description={desc} images={v.images} date={date} readCount={v.views} commentsCount={v.commentsCounts} categaries={v.categories} likeCount={v.likes} cardType={type} coverImg={v.coverImg} />;
                     })}
                 </InfiniteScroll>
             )}
