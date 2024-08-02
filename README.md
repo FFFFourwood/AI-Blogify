@@ -6,8 +6,8 @@
 AI Blogify is a powerful personal blogging system integrated with AI
 
 ###### Supported Features
-- [x]  start project 
-- [x]  AI Generate Article Info
+- [x]  -----
+
 ###### Working on it!
 - [ ]  View Articles
 - [ ]  Article Home
@@ -30,3 +30,4 @@ AI Blogify is a powerful personal blogging system integrated with AI
 - 2024-07-23 : corn & open ai service
 - 2024-07-24 : ai article service
 - 2024-07-25 : update article UI
+- 2024-08-02 : Complete all APIs and backend logic for tags and categories.
