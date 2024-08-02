@@ -9,7 +9,11 @@ const router = express.Router();
 //article routes
 router.get('/article/', getAllArticles); //get all articles
 router.get('/article/:id', getArticle); //get article by id
+// router.post('/article/', authMiddleware, createArticle);
+// router.put('/article/:id', authMiddleware, updateArticle);
+// router.delete('/article/:id', authMiddleware, deleteArticle);
 router.get('/article/bycategory/:categoryId', getArticlesByCategory); //get articles by category
+router.get('/article/bytag/:tagId', getArticlesByTag);    //get articles by tag
 
 //category routes
 router.get('/category', getAllCategories); //get all categories
@@ -24,14 +28,5 @@ router.put('/tag/:tagId', authMiddleware, updateTag); //update tag
 router.delete('/tag/:tagId', authMiddleware, deleteTag); //delete tag
 router.get('/tag/:tagId', getTag); // get tag by id
 router.post('/tag/', authMiddleware, createTags); //create tags
-
-
-
-
-// router.get('/tag/:tagId', getArticlesByTag);    //get articles by tag
-// router.post('/article/', authMiddleware, createArticle);
-// router.put('/article/:id', authMiddleware, updateArticle);
-// router.delete('/article/:id', authMiddleware, deleteArticle);
-
 
 export default router;
