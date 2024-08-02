@@ -15,6 +15,11 @@ export const getAllArticles = async (req: Request, res: Response): Promise<void>
     }
 };
 
+
+
+
+
+
 // get articles by category
 export const getArticlesByCategory = async (req: Request, res: Response): Promise<void> => {
     const { categoryId } = req.params;

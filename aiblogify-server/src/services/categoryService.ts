@@ -36,6 +36,20 @@ export const createCategories = async (names: string[]): Promise<ICategory[]> =>
     return categories;
 };
 
+// Query all categories
+export const getAllCategories = async (): Promise<ICategory[]> => {
+    const categories = await Category.find();
+    return categories;
+};
+
+
+
+
+
+
+
+
+
 // Update category, update category name and slug according to ID.
 export const updateCategory = async (categoryId: ObjectId, name: string): Promise<ICategory | null> => {
     const slug = name.trim().replace(/\s+/g, '-').toLowerCase();
@@ -56,11 +70,6 @@ export const deleteCategory = async (categoryId: ObjectId): Promise<{ message: s
     return { message: 'Category deleted successfully' };
 };
 
-// Query all categories
-export const getAllCategories = async (): Promise<ICategory[]> => {
-    const categories = await Category.find();
-    return categories;
-};
 
 // Query a single category, query the category by ID.
 export const getCategoryById = async (categoryId: ObjectId): Promise<ICategory | null> => {
