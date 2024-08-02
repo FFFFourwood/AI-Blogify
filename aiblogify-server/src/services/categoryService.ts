@@ -42,14 +42,6 @@ export const getAllCategories = async (): Promise<ICategory[]> => {
     return categories;
 };
 
-
-
-
-
-
-
-
-
 // Update category, update category name and slug according to ID.
 export const updateCategory = async (categoryId: ObjectId, name: string): Promise<ICategory | null> => {
     const slug = name.trim().replace(/\s+/g, '-').toLowerCase();
