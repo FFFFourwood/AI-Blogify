@@ -1,26 +1,33 @@
 import { ObjectId } from 'mongoose';
 import Category, { ICategory } from '../models/categoryModel';
+import logger from '../utils/logger';
+
+
 
 // Create a category, return the existing category if the name exists.
-
 export const createCategories = async (names: string[]): Promise<ICategory[]> => {
     const categories: ICategory[] = [];
-
+    logger.info(`CategoryService:Creating category:${names}`);
     const promises = names.map(async (name) => {
         const slug = name.trim().replace(/\s+/g, '-').toLowerCase();
         try {
             let existingCategory = await Category.findOne({ slug });
+            logger.info(`CategoryService:existingCategory:${existingCategory}`);
             if (existingCategory) {
+                logger.info(`CategoryService:Category already exists`);
                 return existingCategory;
             } else {
                 const newCategory = await Category.create({ name, slug });
+                logger.info(`CategoryService:Category created successfully : ${newCategory}`);
                 return newCategory;
             }
         } catch (error) {
             if (error.code === 11000) {
+                logger.error(`CategoryService:Error creating category:${error}`);
                 const existingCategory = await Category.findOne({ slug });
                 return existingCategory;
             } else {
+                logger.error(`CategoryService:Error creating category:${error}`);
                 throw error;
             }
         }
@@ -32,7 +39,7 @@ export const createCategories = async (names: string[]): Promise<ICategory[]> =>
             categories.push(category);
         }
     });
-
+    logger.info(`CategoryService:Category created successfully`);
     return categories;
 };
 

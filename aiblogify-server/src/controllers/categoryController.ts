@@ -63,3 +63,46 @@ export const deleteCategory = async (req: Request, res: Response): Promise<void>
         });
     }
 }
+
+//get category
+export const getCategory = async (req: Request, res: Response): Promise<void> => {
+    const { categoryId } = req.params;
+    logger.info(`Category:Getting category`);
+    try {
+        const category = await categoryService.getCategoryById(categoryId);
+        logger.info(`Category:Category fetched successfully`);
+        res.status(200).json(category);
+    } catch (error) {
+        logger.error(`Category:Error fetching category`);
+        res.status(400).json({
+            result: false,
+            message: 'Error fetching category',
+            error
+        });
+    }
+}
+
+//create category
+export const createCategories = async (req: Request, res: Response): Promise<void> => {
+    const { names } = req.body;
+    logger.info(`Category:Creating category`);
+    logger.info(`Received names: ${JSON.stringify(names)}`);
+    try {
+        const category = await categoryService.createCategories(names);
+        logger.info(`Category:Category created successfully`);
+        res.status(200).json(
+            {
+                result: true,
+                message: 'Category created successfully',
+                data: category
+            }
+        );
+    } catch (error) {
+        logger.error(`Category:Error creating category`);
+        res.status(400).json({
+            result: false,
+            message: 'Error creating category',
+            error
+        });
+    }
+}
