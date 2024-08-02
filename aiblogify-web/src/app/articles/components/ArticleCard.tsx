@@ -12,7 +12,7 @@ interface IArticleCardProps {
     date: string;
     readCount: number;
     commentsCount: number;
-    categary: Array<string>;
+    categaries: [];
     likeCount: number;
     cardType: ArticleCardType;
     coverImg: string;

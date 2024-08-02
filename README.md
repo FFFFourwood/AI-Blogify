@@ -6,7 +6,8 @@
 AI Blogify is a powerful personal blogging system integrated with AI
 
 ###### Supported Features
-- [x] start project 
+- [x]  -----
+
 ###### Working on it!
 - [ ]  View Articles
 - [ ]  Article Home
@@ -17,6 +18,7 @@ AI Blogify is a powerful personal blogging system integrated with AI
 - [ ]  Delete Articles
 
 
+
 ### Development Logs
 - 2024-07-16 : initial project
 - 2024-07-17 : init BE server & FE Header UI
@@ -25,3 +27,7 @@ AI Blogify is a powerful personal blogging system integrated with AI
 - 2024-07-20 : add Permission Verify & Header Permission $ article home UI
 - 2024-07-21 : add article list & article card UI 
 - 2024-07-22 : add article home UI & finish migration tool
+- 2024-07-23 : corn & open ai service
+- 2024-07-24 : ai article service
+- 2024-07-25 : update article UI
+- 2024-08-02 : Complete all APIs and backend logic for tags and categories.

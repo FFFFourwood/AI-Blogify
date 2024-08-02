@@ -1,8 +1,10 @@
 import Article, { IArticle } from '../models/articleModel';
-import { FilterQuery, PaginateOptions, PaginateResult } from 'mongoose';
+import { FilterQuery, Types } from 'mongoose';
 import { extractImageUrls } from '../utils/utils';
 import Image from '../models/imageModel';
 import { ObjectId } from 'bson';
+import logger from '../utils/logger';
+
 
 const aggregateArticles = async (filter: FilterQuery<IArticle>, page: number, limit: number): Promise<any> => {
     const articles = await Article.aggregate([
@@ -18,6 +20,62 @@ const aggregateArticles = async (filter: FilterQuery<IArticle>, page: number, li
                 as: 'images'
             }
         },
+        {
+            $lookup: {
+                from: 'articlecategories',
+                localField: '_id',
+                foreignField: 'articleId',
+                as: 'articlecategories'
+            }
+        },
+        {
+            $lookup: {
+                from: 'articletags',
+                localField: '_id',
+                foreignField: 'articleId',
+                as: 'articletags'
+            }
+        },
+        {
+            $unwind: {
+                path: '$articletags',
+                preserveNullAndEmptyArrays: true
+            }
+        },
+        {
+            $unwind: {
+                path: '$articlecategories',
+                preserveNullAndEmptyArrays: true
+            }
+        },
+        {
+            $lookup: {
+                from: 'categories',
+                localField: 'articlecategories.categoryId',
+                foreignField: '_id',
+                as: 'categories'
+            }
+        },
+        {
+            $lookup: {
+                from: 'tags',
+                localField: 'articletags.tagId',
+                foreignField: '_id',
+                as: 'tags'
+            }
+        },
+        {
+            $unwind: {
+                path: '$categories',
+                preserveNullAndEmptyArrays: true
+            }
+        },
+        {
+            $unwind: {
+                path: '$tags',
+                preserveNullAndEmptyArrays: true
+            }
+        },
         // {
         //     $lookup: {
         //         from: 'users',
@@ -27,11 +85,33 @@ const aggregateArticles = async (filter: FilterQuery<IArticle>, page: number, li
         //     }
         // },
         // { $unwind: '$author' }, // Unwind author array
+
+        {
+            $group: {
+                _id: '$_id',
+                title: { $first: '$title' },
+                content: { $first: '$content' },
+                createdAt: { $first: '$createdAt' },
+                updatedAt: { $first: '$updatedAt' },
+                slug: { $first: '$slug' },
+                status: { $first: '$status' },
+                commentsCounts: { $first: '$commentsCounts' },
+                views: { $first: '$views' },
+                likes: { $first: '$likes' },
+                type: { $first: '$type' },
+                description: { $first: '$description' },
+                coverImg: { $first: '$coverImg' },
+                images: { $first: { $map: { input: "$images", as: "image", in: "$$image.url" } } },
+                categories: { $addToSet: '$categories' },
+                tags: { $addToSet: '$tags' },
+            }
+        },
         {
             $project: {
                 title: 1,
                 content: 1,
-                // author: { username: 1, email: 1 }, // Include only specific fields from author
+                categories: 1,
+                tags: 1,
                 createdAt: 1,
                 updatedAt: 1,
                 slug: 1,
@@ -40,12 +120,13 @@ const aggregateArticles = async (filter: FilterQuery<IArticle>, page: number, li
                 views: 1,
                 likes: 1,
                 type: 1,
-                categories: 1,
-                tags: 1,
                 description: 1,
                 coverImg: 1,
-                images: { $map: { input: "$images", as: "image", in: "$$image.url" } }
+                images: 1,
             }
+        },
+        {
+            $sort: { createdAt: -1 } // 再次按照创建时间进行排序
         }
     ]).exec();
 
@@ -65,20 +146,294 @@ const aggregateArticles = async (filter: FilterQuery<IArticle>, page: number, li
     };
 };
 
+
+// get all articles
 const getAllArticles = async (page: number, limit: number): Promise<any> => {
     return aggregateArticles({}, page, limit);
 };
-const getArticlesByCategory = async (categoryId: string, page: number, limit: number): Promise<any> => {
-    return aggregateArticles({ categories: new ObjectId(categoryId) }, page, limit);
-};
 
-const getArticlesByTag = async (tagId: string, page: number, limit: number): Promise<any> => {
-    return aggregateArticles({ tags: new ObjectId(tagId) }, page, limit);
-};
-
+// get article by id
 const getArticleById = async (id: string): Promise<any | null> => {
     const articles = await aggregateArticles({ _id: new ObjectId(id) }, 1, 1);
     return articles.docs.length ? articles.docs[0] : null;
+};
+
+// get articles by categoryId
+const getArticlesByCategory = async (categoryId: string, page: number, limit: number): Promise<any> => {
+    const categoryObjectId = new Types.ObjectId(categoryId);
+    logger.info(`ArticleService:Getting articles by category`);
+    const articles = await Article.aggregate([
+        {
+            $lookup: {
+                from: 'articlecategories',
+                localField: '_id',
+                foreignField: 'articleId',
+                as: 'articlecategories'
+            }
+        },
+        {
+            $unwind: {
+                path: '$articlecategories',
+                preserveNullAndEmptyArrays: false // 我们不需要保留空数组
+            }
+        },
+        {
+            $match: {
+                'articlecategories.categoryId': categoryObjectId
+            }
+        },
+        { $sort: { createdAt: -1 } },
+        { $skip: (page - 1) * limit },
+        { $limit: limit },
+        {
+            $lookup: {
+                from: 'images',
+                localField: '_id',
+                foreignField: 'article',
+                as: 'images'
+            }
+        },
+        {
+            $lookup: {
+                from: 'articletags',
+                localField: '_id',
+                foreignField: 'articleId',
+                as: 'articletags'
+            }
+        },
+        {
+            $unwind: {
+                path: '$articletags',
+                preserveNullAndEmptyArrays: true
+            }
+        },
+        {
+            $lookup: {
+                from: 'categories',
+                localField: 'articlecategories.categoryId',
+                foreignField: '_id',
+                as: 'categories'
+            }
+        },
+        {
+            $lookup: {
+                from: 'tags',
+                localField: 'articletags.tagId',
+                foreignField: '_id',
+                as: 'tags'
+            }
+        },
+        {
+            $unwind: {
+                path: '$categories',
+                preserveNullAndEmptyArrays: true
+            }
+        },
+        {
+            $unwind: {
+                path: '$tags',
+                preserveNullAndEmptyArrays: true
+            }
+        },
+        {
+            $group: {
+                _id: '$_id',
+                title: { $first: '$title' },
+                content: { $first: '$content' },
+                createdAt: { $first: '$createdAt' },
+                updatedAt: { $first: '$updatedAt' },
+                slug: { $first: '$slug' },
+                status: { $first: '$status' },
+                commentsCounts: { $first: '$commentsCounts' },
+                views: { $first: '$views' },
+                likes: { $first: '$likes' },
+                type: { $first: '$type' },
+                description: { $first: '$description' },
+                coverImg: { $first: '$coverImg' },
+                images: { $first: { $map: { input: "$images", as: "image", in: "$$image.url" } } },
+                categories: { $addToSet: '$categories' },
+                tags: { $addToSet: '$tags' },
+            }
+        },
+        {
+            $project: {
+                title: 1,
+                content: 1,
+                categories: 1,
+                tags: 1,
+                createdAt: 1,
+                updatedAt: 1,
+                slug: 1,
+                status: 1,
+                commentsCounts: 1,
+                views: 1,
+                likes: 1,
+                type: 1,
+                description: 1,
+                coverImg: 1,
+                images: 1,
+            }
+        },
+        {
+            $sort: { createdAt: -1 } // 再次按照创建时间进行排序
+        }
+    ]).exec();
+    logger.info(`ArticleService:Articles fetched successfully`);
+    const total = await Article.countDocuments({
+        _id: { $in: articles.map(article => article._id) }
+    });
+    return {
+        docs: articles,
+        totalDocs: total,
+        limit,
+        page,
+        totalPages: Math.ceil(total / limit),
+        pagingCounter: (page - 1) * limit + 1,
+        hasPrevPage: page > 1,
+        hasNextPage: page < Math.ceil(total / limit),
+        prevPage: page > 1 ? page - 1 : null,
+        nextPage: page < Math.ceil(total / limit) ? page + 1 : null
+    };
+};
+
+
+// get articles by tagId
+
+const getArticlesByTag = async (tagId: string, page: number, limit: number): Promise<any> => {
+    const tagObjectId = new Types.ObjectId(tagId);
+    logger.info(`ArticleService:Getting articles by tag`);
+    const articles = await Article.aggregate([
+        {
+            $lookup: {
+                from: 'articletags',
+                localField: '_id',
+                foreignField: 'articleId',
+                as: 'articletags'
+            }
+        },
+        {
+            $unwind: {
+                path: '$articletags',
+                preserveNullAndEmptyArrays: false // 我们不需要保留空数组
+            }
+        },
+        {
+            $match: {
+                'articletags.tagId': tagObjectId
+            }
+        },
+        { $sort: { createdAt: -1 } },
+        { $skip: (page - 1) * limit },
+        { $limit: limit },
+        {
+            $lookup: {
+                from: 'images',
+                localField: '_id',
+                foreignField: 'article',
+                as: 'images'
+            }
+        },
+        {
+            $lookup: {
+                from: 'articletags',
+                localField: '_id',
+                foreignField: 'articleId',
+                as: 'articletags'
+            }
+        },
+        {
+            $unwind: {
+                path: '$articletags',
+                preserveNullAndEmptyArrays: true
+            }
+        },
+        {
+            $lookup: {
+                from: 'categories',
+                localField: 'articlecategories.categoryId',
+                foreignField: '_id',
+                as: 'categories'
+            }
+        },
+        {
+            $lookup: {
+                from: 'tags',
+                localField: 'articletags.tagId',
+                foreignField: '_id',
+                as: 'tags'
+            }
+        },
+        {
+            $unwind: {
+                path: '$categories',
+                preserveNullAndEmptyArrays: true
+            }
+        },
+        {
+            $unwind: {
+                path: '$tags',
+                preserveNullAndEmptyArrays: true
+            }
+        },
+        {
+            $group: {
+                _id: '$_id',
+                title: { $first: '$title' },
+                content: { $first: '$content' },
+                createdAt: { $first: '$createdAt' },
+                updatedAt: { $first: '$updatedAt' },
+                slug: { $first: '$slug' },
+                status: { $first: '$status' },
+                commentsCounts: { $first: '$commentsCounts' },
+                views: { $first: '$views' },
+                likes: { $first: '$likes' },
+                type: { $first: '$type' },
+                description: { $first: '$description' },
+                coverImg: { $first: '$coverImg' },
+                images: { $first: { $map: { input: "$images", as: "image", in: "$$image.url" } } },
+                categories: { $addToSet: '$categories' },
+                tags: { $addToSet: '$tags' },
+            }
+        },
+        {
+            $project: {
+                title: 1,
+                content: 1,
+                categories: 1,
+                tags: 1,
+                createdAt: 1,
+                updatedAt: 1,
+                slug: 1,
+                status: 1,
+                commentsCounts: 1,
+                views: 1,
+                likes: 1,
+                type: 1,
+                description: 1,
+                coverImg: 1,
+                images: 1,
+            }
+        },
+        {
+            $sort: { createdAt: -1 }
+        }
+    ]).exec();
+    logger.info(`ArticleService:Articles fetched successfully`);
+    const total = await Article.countDocuments({
+        _id: { $in: articles.map(article => article._id) }
+    });
+    return {
+        docs: articles,
+        totalDocs: total,
+        limit,
+        page,
+        totalPages: Math.ceil(total / limit),
+        pagingCounter: (page - 1) * limit + 1,
+        hasPrevPage: page > 1,
+        hasNextPage: page < Math.ceil(total / limit),
+        prevPage: page > 1 ? page - 1 : null,
+        nextPage: page < Math.ceil(total / limit) ? page + 1 : null
+    };
 };
 
 const createArticle = async (title: string, content: string, authorId: string): Promise<IArticle> => {

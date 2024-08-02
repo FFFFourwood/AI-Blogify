@@ -1,9 +1,9 @@
 import express from 'express';
-import { generateText } from '../controllers/openaiController';
 import authMiddleware from '../middlewares/authMiddleware';
+import { generateBlogBasicInfo } from '../controllers/openAIController';
 
 const router = express.Router();
 
-router.post('/generate', authMiddleware, generateText);
+router.get('/generateBlogInfo/:id', authMiddleware, generateBlogBasicInfo);
 
 export default router;

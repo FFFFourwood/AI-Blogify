@@ -40,7 +40,9 @@ const DefaultCard = (props: any) => {
                             <Chip label={props.readCount} size="small" icon={<VisibilityOutlinedIcon fontSize="small" />} className="mr-2 mb-2" />
                             <Chip label={props.commentsCount} size="small" icon={<InsertCommentOutlinedIcon fontSize="small" />} className="mr-2 mb-2" />
                             <Chip label={props.likeCount} size="small" icon={<FavoriteBorderOutlinedIcon fontSize="small" />} className="mr-2 mb-2" />
-                            <Chip label={props.categary} size="small" icon={<ClassOutlinedIcon fontSize="small" />} className="mr-2 mb-2" />
+                            {props.categaries.map((v: any) => (
+                                <Chip label={v.name} key={v._id} size="small" icon={<ClassOutlinedIcon fontSize="small" />} className="mr-2 mb-2" />
+                            ))}
                         </div>
 
                         <StyledTypography variant="body2" color="text.secondary">
